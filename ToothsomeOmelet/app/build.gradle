@@ -24,6 +24,7 @@ ext {
     glideVersion = '4.7.1'
     lifeCycleVersion = '1.1.1'
     JUNITVersion = '4.12'
+    gsonVersion = '2.8.2'
     retrofitVersion = '2.4.0'
     testRunnerVersion = '1.0.1'
     espressoVersion = '3.0.1'
@@ -46,6 +47,8 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$lifeCycleVersion"
     // retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    // gson
+    implementation "com.google.code.gson:gson:$gsonVersion"
     // test
     testImplementation "junit:junit:$JUNITVersion"
     androidTestImplementation "com.android.support.test:runner:$testRunnerVersion"
