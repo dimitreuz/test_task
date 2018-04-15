@@ -1,4 +1,4 @@
-package com.sokolov.dimitreuz.mostdeliciousomelet.utils;
+package com.sokolov.dimitreuz.mostdeliciousomelet.ui.list;
 
 import android.databinding.ViewDataBinding;
 import android.support.annotation.IdRes;
