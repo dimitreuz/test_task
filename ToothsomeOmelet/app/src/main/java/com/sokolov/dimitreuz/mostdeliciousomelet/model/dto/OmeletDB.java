@@ -19,6 +19,14 @@ public class OmeletDB extends AbstractOmelet {
     @ColumnInfo(name = "thumbnail")
     private String mThumbnail;
 
+    public OmeletDB() {
+        super();
+    }
+
+    public OmeletDB(Omelet omelet) {
+        super(omelet);
+    }
+
     public int getId() {
         return mId;
     }

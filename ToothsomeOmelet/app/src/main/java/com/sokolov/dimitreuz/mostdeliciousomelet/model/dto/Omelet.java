@@ -25,6 +25,17 @@ public interface Omelet {
         private String mIngredients;
         private String mThumbnail;
 
+        public OmeletDTO(Omelet omelet) {
+            setTitle(omelet.getTitle());
+            setHref(omelet.getHref());
+            setIngredients(omelet.getIngredients());
+            setThumbnail(omelet.getThumbnail());
+        }
+
+        public OmeletDTO() {
+
+        }
+
         @Override
         public String getTitle() {
             return mTitle;

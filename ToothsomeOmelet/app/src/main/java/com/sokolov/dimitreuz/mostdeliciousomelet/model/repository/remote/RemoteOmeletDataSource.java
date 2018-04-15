@@ -2,30 +2,34 @@ package com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.remote;
 
 import android.support.annotation.NonNull;
 
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.AppExecutors;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.api.OmeletsAPI;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.dto.OmeletAPI;
-import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.OmeletDataSource;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.AbstractOmeletDataSource;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-public class RemoteOmeletDataSource implements OmeletDataSource<OmeletAPI> {
+public class RemoteOmeletDataSource extends AbstractOmeletDataSource<OmeletAPI> {
 
     private OmeletsAPI mOmeletsAPI;
 
-    public RemoteOmeletDataSource() {
+    public RemoteOmeletDataSource(AppExecutors appExecutors) {
+        super(appExecutors);
         mOmeletsAPI = OmeletsAPI.getInstance();
     }
 
     @Override
-    public List<OmeletAPI> getOmelets(@NonNull ExecutionCallback callback) {
-        try {
-            return getApiService().getAllOmelet().execute().body();
-        } catch (IOException e) {
-            callback.onDataNotAvailable();
-            return new ArrayList<>();
-        }
+    public void getOmelets(@NonNull ExecutionCallback<OmeletAPI> callback) {
+        Runnable r = () -> {
+            try {
+                List<OmeletAPI> omeletes = getApiService().getAllOmelet().execute().body();
+                callback.onOmeletsLoaded(omeletes);
+            } catch (IOException e) {
+                callback.onDataNotAvailable();
+            }
+        };
+
     }
 
     public OmeletsAPI.ApiService getApiService() {

@@ -1,28 +1,40 @@
 package com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.local;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.AppExecutors;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.database.AppDatabase;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.database.OmeletDAO;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.dto.OmeletDB;
-import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.OmeletDataSource;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.AbstractOmeletDataSource;
 
 import java.util.List;
 
-public class LocalOmeletDataSource implements OmeletDataSource<OmeletDB> {
+public class LocalOmeletDataSource extends AbstractOmeletDataSource<OmeletDB> {
 
     private AppDatabase mAppDatabse;
 
-    public LocalOmeletDataSource(Context context) {
+    public LocalOmeletDataSource(@NonNull AppExecutors appExecutors, @NonNull Context context) {
+        super(appExecutors);
         mAppDatabse = AppDatabase.getInstance(context);
     }
 
     @Override
-    public List<OmeletDB> getOmelets(ExecutionCallback callback) {
-        return mAppDatabse.getOmeletDAO().getAll();
+    public void getOmelets(ExecutionCallback<OmeletDB> callback) {
+        try {
+            List<OmeletDB> omelets = mAppDatabse.getOmeletDAO().getAll();
+            if (omelets == null || omelets.isEmpty()) {
+                callback.onDataNotAvailable();
+            } else {
+                callback.onOmeletsLoaded(omelets);
+            }
+        } catch (Exception e) {
+            callback.onDataNotAvailable();
+        }
     }
 
-    public OmeletDAO getOmeleteDAO() {
+    public OmeletDAO getOmeletDAO() {
         return mAppDatabse.getOmeletDAO();
     }
 }
