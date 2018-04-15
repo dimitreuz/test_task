@@ -5,7 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = "omelet")
-public class OmeleteDB extends AbstractOmelet {
+public class OmeletDB extends AbstractOmelet {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "recipeId")

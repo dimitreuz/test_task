@@ -1,13 +1,34 @@
 package com.sokolov.dimitreuz.mostdeliciousomelet.model.database;
 
 import android.arch.persistence.room.Database;
+import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.content.Context;
 
-import com.sokolov.dimitreuz.mostdeliciousomelet.model.dto.OmeleteDB;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.dto.OmeletDB;
 
 
-@Database(entities = {OmeleteDB.class}, version = 1)
+@Database(entities = {OmeletDB.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
+
+    private static final String DATABASE_NAME = "omelets-database";
+
+    private static AppDatabase mInstance;
+
+    private static final Object LOCKER = new Object();
+
+    public static AppDatabase getInstance(Context context) {
+        synchronized (LOCKER) {
+            if (mInstance == null) {
+                mInstance = Room.databaseBuilder(
+                        context.getApplicationContext(),
+                        AppDatabase.class,
+                        DATABASE_NAME
+                ).build();
+            }
+            return mInstance;
+        }
+    }
 
     public abstract OmeletDAO getOmeletDAO();
 }

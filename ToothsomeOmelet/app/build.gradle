@@ -47,6 +47,7 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$lifeCycleVersion"
     // retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     // gson
     implementation "com.google.code.gson:gson:$gsonVersion"
     // test

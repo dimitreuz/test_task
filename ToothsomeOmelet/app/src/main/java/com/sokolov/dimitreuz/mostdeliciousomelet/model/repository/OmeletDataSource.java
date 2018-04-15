@@ -4,7 +4,7 @@ import com.sokolov.dimitreuz.mostdeliciousomelet.model.dto.Omelet;
 
 import java.util.List;
 
-public interface OmeletDataSource<T> {
+public interface OmeletDataSource<O extends Omelet> {
 
     interface ExecutionCallback {
 
@@ -21,9 +21,5 @@ public interface OmeletDataSource<T> {
         void onSavedOmeletsLoaded(List<Omelet> omelets);
     }
 
-    void getOmelets(ExecutionCallback callback);
-
-    void saveOmelet(Omelet omelet);
-
-    void deleteAllOmelets();
+    List<O> getOmelets(ExecutionCallback callback);
 }

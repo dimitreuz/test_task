@@ -12,6 +12,4 @@ public abstract class AbstractOmelet implements Omelet {
     public AbstractOmelet() {
         this(new OmeletDTO());
     }
-
-
 }

@@ -6,7 +6,7 @@ import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
-public class OmeleteAPI extends AbstractOmelet {
+public class OmeletAPI extends AbstractOmelet {
 
     @SerializedName("title")
     private String mTitle;
