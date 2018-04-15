@@ -1,6 +1,6 @@
 package com.sokolov.dimitreuz.mostdeliciousomelet.model.api;
 
-import com.sokolov.dimitreuz.mostdeliciousomelet.model.dto.OmeletAPI;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.OmeletAPI;
 
 import java.util.List;
 

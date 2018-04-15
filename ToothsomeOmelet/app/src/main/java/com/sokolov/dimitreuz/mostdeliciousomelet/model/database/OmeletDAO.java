@@ -3,7 +3,7 @@ package com.sokolov.dimitreuz.mostdeliciousomelet.model.database;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Query;
 
-import com.sokolov.dimitreuz.mostdeliciousomelet.model.dto.OmeletDB;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.OmeletDB;
 
 import java.util.List;
 

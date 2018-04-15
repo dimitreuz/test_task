@@ -1,7 +1,7 @@
 package com.sokolov.dimitreuz.mostdeliciousomelet.model.repository;
 
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.AppExecutors;
-import com.sokolov.dimitreuz.mostdeliciousomelet.model.dto.Omelet;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.Omelet;
 
 public abstract class AbstractOmeletDataSource<T extends Omelet> implements OmeletDataSource<T> {
 

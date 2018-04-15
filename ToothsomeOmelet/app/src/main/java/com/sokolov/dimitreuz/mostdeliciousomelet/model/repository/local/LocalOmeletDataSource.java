@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.AppExecutors;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.database.AppDatabase;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.database.OmeletDAO;
-import com.sokolov.dimitreuz.mostdeliciousomelet.model.dto.OmeletDB;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.OmeletDB;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.AbstractOmeletDataSource;
 
 import java.util.List;

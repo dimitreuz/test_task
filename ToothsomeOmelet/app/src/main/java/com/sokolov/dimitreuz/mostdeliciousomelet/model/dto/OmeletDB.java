@@ -1,4 +1,4 @@
-package com.sokolov.dimitreuz.mostdeliciousomelet.model.dto;
+package com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;

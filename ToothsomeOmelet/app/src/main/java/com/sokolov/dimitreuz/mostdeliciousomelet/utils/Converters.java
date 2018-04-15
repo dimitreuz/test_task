@@ -2,8 +2,8 @@ package com.sokolov.dimitreuz.mostdeliciousomelet.utils;
 
 import android.support.annotation.NonNull;
 
-import com.sokolov.dimitreuz.mostdeliciousomelet.model.dto.Omelet;
-import com.sokolov.dimitreuz.mostdeliciousomelet.model.dto.OmeletDB;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.Omelet;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.OmeletDB;
 
 import java.util.ArrayList;
 import java.util.List;
