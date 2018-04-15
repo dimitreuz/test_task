@@ -1,8 +1,4 @@
-package com.sokolov.dimitreuz.mostdeliciousomelet.model.dto;
-
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
+package com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO;
 
 import com.google.gson.annotations.SerializedName;
 

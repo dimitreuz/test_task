@@ -4,9 +4,9 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.AppExecutors;
-import com.sokolov.dimitreuz.mostdeliciousomelet.model.dto.Omelet;
-import com.sokolov.dimitreuz.mostdeliciousomelet.model.dto.OmeletAPI;
-import com.sokolov.dimitreuz.mostdeliciousomelet.model.dto.OmeletDB;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.Omelet;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.OmeletAPI;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.OmeletDB;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.local.LocalOmeletDataSource;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.remote.RemoteOmeletDataSource;
 import com.sokolov.dimitreuz.mostdeliciousomelet.utils.Converters;

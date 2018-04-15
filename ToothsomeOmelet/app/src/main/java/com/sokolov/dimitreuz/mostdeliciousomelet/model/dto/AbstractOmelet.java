@@ -1,4 +1,4 @@
-package com.sokolov.dimitreuz.mostdeliciousomelet.model.dto;
+package com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO;
 
 public abstract class AbstractOmelet implements Omelet {
 

@@ -5,7 +5,7 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
-import com.sokolov.dimitreuz.mostdeliciousomelet.model.dto.OmeletDB;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.OmeletDB;
 
 
 @Database(entities = {OmeletDB.class}, version = 1)

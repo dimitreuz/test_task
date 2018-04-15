@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.AppExecutors;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.api.OmeletsAPI;
-import com.sokolov.dimitreuz.mostdeliciousomelet.model.dto.OmeletAPI;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.OmeletAPI;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.AbstractOmeletDataSource;
 
 import java.io.IOException;
