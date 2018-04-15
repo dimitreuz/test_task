@@ -1,9 +1,10 @@
 package com.sokolov.dimitreuz.mostdeliciousomelet.model.dto;
 
 import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
-
+@Entity(tableName = "omelet")
 public class OmeleteDB extends AbstractOmelet {
 
     @PrimaryKey(autoGenerate = true)
