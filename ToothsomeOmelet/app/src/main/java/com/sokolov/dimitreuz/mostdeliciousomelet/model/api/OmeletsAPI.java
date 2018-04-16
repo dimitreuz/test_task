@@ -1,8 +1,5 @@
 package com.sokolov.dimitreuz.mostdeliciousomelet.model.api;
 
-import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.OmeletAPI;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -43,9 +40,9 @@ public class OmeletsAPI {
         String SEARCH_URL = API_END_POINT;
 
         @GET(DEFAULT_URL)
-        Call<List<OmeletAPI>> getAllOmelet();
+        Call<OmeletsAPIHolder> getAllOmelet();
 
         @GET(SEARCH_URL)
-        Call<List<OmeletAPI>> getSeacrhedOmeletes();
+        Call<OmeletsAPIHolder> getSeacrhedOmeletes();
     }
 }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MostDeliciousOmelet</string>
+    <string name="omelets_activity_title">Omelets</string>
 </resources>

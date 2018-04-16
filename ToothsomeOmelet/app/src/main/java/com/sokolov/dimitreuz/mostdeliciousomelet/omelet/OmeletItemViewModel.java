@@ -1,15 +1,16 @@
 package com.sokolov.dimitreuz.mostdeliciousomelet.omelet;
 
-import android.content.Context;
+import android.databinding.BaseObservable;
 import android.databinding.Observable;
 import android.databinding.ObservableField;
+import android.support.annotation.NonNull;
 
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.Omelet;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.OmeletRepository;
 
 import java.lang.ref.WeakReference;
 
-public class OmeletItemViewModel {
+public class OmeletItemViewModel extends BaseObservable {
 
     public final ObservableField<String> title = new ObservableField<>();
 
@@ -21,12 +22,13 @@ public class OmeletItemViewModel {
 
     private final ObservableField<Omelet.OmeletDTO> mOmelet = new ObservableField<>();
 
-    private Context mContext;
+    @NonNull
+    private final OmeletRepository mRepository;
 
     private WeakReference<OmeletNavigator> mNavigator;
 
-    public OmeletItemViewModel(Context context) {
-        this.mContext = context;
+    public OmeletItemViewModel(OmeletRepository repository) {
+        this.mRepository = repository;
         this.mOmelet.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
@@ -51,12 +53,12 @@ public class OmeletItemViewModel {
 
     public void onOmeletClicked() {
         String currentLink = href.get();
-
         if (currentLink != null && mNavigator != null) {
             OmeletNavigator navigator = mNavigator.get();
             if (navigator != null) {
-                navigator.openOmeletRecipe(currentLink);
+                navigator.onOmeletItemClick(currentLink);
             }
         }
     }
+
 }

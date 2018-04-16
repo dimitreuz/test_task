@@ -1,10 +1,8 @@
 package com.sokolov.dimitreuz.mostdeliciousomelet.omelet;
 
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-public class OmeletNavigator {
+public interface OmeletNavigator {
 
-    public void openOmeletRecipe(@NonNull String href) {
-
-    }
+    void onOmeletItemClick(@Nullable String href);
 }

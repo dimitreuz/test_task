@@ -10,7 +10,7 @@ import java.util.List;
 @Dao
 public interface OmeletDAO extends ObjectDAO<OmeletDB> {
 
-    @Query("SELECT * FROM OmeletDB")
+    @Query("SELECT * FROM omelet")
     public List<OmeletDB> getAll();
 
 }
