@@ -4,20 +4,22 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.databinding.BaseObservable;
 import android.databinding.Observable;
+import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
-import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.view.View;
 
+
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.AppExecutors;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.Omelet;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.OmeletDataSource;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.OmeletRepository;
-import com.sokolov.dimitreuz.mostdeliciousomelet.ui.view.DishSearchEditText;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 public class OmeletsListViewModel extends BaseObservable
         implements OmeletDataSource.ExecutionCallback<Omelet.OmeletDTO> {
@@ -26,8 +28,10 @@ public class OmeletsListViewModel extends BaseObservable
     private final MutableLiveData<List<Omelet>> mOmelets;
     @NonNull
     private final OmeletRepository mRepository;
+    @Nullable
+    private Executor mCurrentExecutor;
 
-    public final ObservableInt placeholderVisibility = new ObservableInt(View.VISIBLE);
+    public final ObservableBoolean placeholderVisibility = new ObservableBoolean(true);
 
     public final ObservableField<String> inputText = new ObservableField<>();
 
@@ -41,10 +45,21 @@ public class OmeletsListViewModel extends BaseObservable
     @Override
     public void onOmeletsLoaded(List<Omelet.OmeletDTO> omelets) {
         if (!omelets.isEmpty()) {
+            placeholderVisibility.set(false);
             List<Omelet> list = Collections.unmodifiableList(omelets);
-            placeholderVisibility.set(View.GONE);
             mOmelets.setValue(list);
         }
+    }
+
+    private void searchDish(@NonNull String dishName) {
+        if (mCurrentExecutor != null) {
+            if (mCurrentExecutor instanceof AppExecutors.CancelableFuturesExecutor) {
+                AppExecutors.CancelableFuturesExecutor executor;
+                executor = (AppExecutors.CancelableFuturesExecutor) mCurrentExecutor;
+                executor.shutdownFutures();
+            }
+        }
+        mCurrentExecutor = mRepository.searchForOmelets(OmeletsListViewModel.this, dishName);
     }
 
     private void registerInputTextObserver() {
@@ -55,7 +70,7 @@ public class OmeletsListViewModel extends BaseObservable
                 if (TextUtils.isEmpty(text)) {
                     start();
                 } else {
-                    mRepository.searchForOmelets(OmeletsListViewModel.this, text);
+                    searchDish(text);
                 }
             }
         });
@@ -63,7 +78,7 @@ public class OmeletsListViewModel extends BaseObservable
 
     @Override
     public void onDataNotAvailable() {
-        placeholderVisibility.set(View.VISIBLE);
+        placeholderVisibility.set(true);
     }
 
     public void start() {
