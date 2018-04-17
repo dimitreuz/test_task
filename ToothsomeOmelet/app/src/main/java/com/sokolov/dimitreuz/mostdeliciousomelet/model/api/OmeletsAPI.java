@@ -5,6 +5,7 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
+import retrofit2.http.Query;
 
 public class OmeletsAPI {
 
@@ -43,6 +44,6 @@ public class OmeletsAPI {
         Call<OmeletsAPIHolder> getAllOmelet();
 
         @GET(SEARCH_URL)
-        Call<OmeletsAPIHolder> getSeacrhedOmeletes();
+        Call<OmeletsAPIHolder> getSearchedOmelets(@Query("q") String dishName);
     }
 }
