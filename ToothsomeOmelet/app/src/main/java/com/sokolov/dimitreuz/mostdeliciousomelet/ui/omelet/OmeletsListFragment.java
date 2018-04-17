@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -23,6 +24,9 @@ import com.sokolov.dimitreuz.mostdeliciousomelet.utils.Converters;
 
 public class OmeletsListFragment extends BaseFragment<OmeletsListViewModel> implements OmeletNavigator, TextWatcher {
 
+    @NonNull
+    private EditText mEditText;
+    @NonNull
     private OmeletsAdapter mAdapter;
 
     public OmeletsListFragment() {}
@@ -44,14 +48,15 @@ public class OmeletsListFragment extends BaseFragment<OmeletsListViewModel> impl
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
+        getViewModel().start();
         getViewModel().getOmelets().observe(this, omelets -> {
             if (omelets != null) {
                 mAdapter.setItems(Converters.convertToCachedOmelets(omelets));
             }
         });
-        getViewModel().start();
+        getViewModel().inputText.set(mEditText.getText().toString());
     }
 
     private void setupRecyclerView(View view) {
@@ -62,8 +67,8 @@ public class OmeletsListFragment extends BaseFragment<OmeletsListViewModel> impl
     }
 
     private void setupSearchEditText(View view) {
-        EditText editText = view.findViewById(R.id.dish_search_editText);
-        editText.addTextChangedListener(this);
+        mEditText = view.findViewById(R.id.dish_search_editText);
+        mEditText.addTextChangedListener(this);
     }
 
     private void setupPlaceholder(View view) {
@@ -85,9 +90,10 @@ public class OmeletsListFragment extends BaseFragment<OmeletsListViewModel> impl
     }
 
     @Override
-    public void onPause() {
+    public void onStop() {
         getViewModel().getOmelets().removeObservers(this);
-        super.onPause();
+        getViewModel().stop();
+        super.onStop();
     }
 
     @Override

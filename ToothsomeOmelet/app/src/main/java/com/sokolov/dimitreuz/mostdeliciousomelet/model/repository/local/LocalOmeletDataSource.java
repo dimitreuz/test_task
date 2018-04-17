@@ -9,6 +9,7 @@ import com.sokolov.dimitreuz.mostdeliciousomelet.model.database.OmeletDAO;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.OmeletDB;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.AbstractOmeletDataSource;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -22,19 +23,14 @@ public class LocalOmeletDataSource extends AbstractOmeletDataSource<OmeletDB> {
     }
 
     @Override
-    public void getOmelets(ExecutionCallback<OmeletDB> callback) {
+    public void getOmeletsAsync(ExecutionCallback<OmeletDB> callback) {
         getAppExecutors().getExecutor(AppExecutors.DISK).execute(
                 () -> {
-                    try {
-                        List<OmeletDB> omelets = mAppDatabase.getOmeletDAO().getAll();
-                        if (omelets == null || omelets.isEmpty()) {
-                            callback.onDataNotAvailable();
-                        } else {
-                            callback.onOmeletsLoaded(omelets);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    List<OmeletDB> omelets = getOmelets();
+                    if (omelets.isEmpty()) {
                         callback.onDataNotAvailable();
+                    } else {
+                        callback.onOmeletsLoaded(omelets);
                     }
                 }
         );
@@ -42,22 +38,34 @@ public class LocalOmeletDataSource extends AbstractOmeletDataSource<OmeletDB> {
     }
 
     @Override
-    public Executor searchForOmelets(@NonNull ExecutionCallback<OmeletDB> callback, @NonNull String dishName) {
+    public List<OmeletDB> getOmelets() {
+        try {
+            return mAppDatabase.getOmeletDAO().getAll();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public void searchForDishesAsync(@NonNull ExecutionCallback<OmeletDB> callback, @NonNull String dishName) {
         Executor executor = getAppExecutors().getExecutor(AppExecutors.DISK);
         executor.execute(() -> {
-            List<OmeletDB> omelets = mAppDatabase.getOmeletDAO().findRequiredOmelets(dishName);
-            try {
-                if (omelets == null) {
-                    callback.onDataNotAvailable();
-                } else {
-                    callback.onOmeletsLoaded(omelets);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            List<OmeletDB> omelets = searchForDishes(dishName);
+            if (omelets.isEmpty()) {
                 callback.onDataNotAvailable();
+            } else {
+                callback.onOmeletsLoaded(omelets);
             }
         });
-        return executor;
+    }
+
+    @Override
+    public List<OmeletDB> searchForDishes(@NonNull String dishName) {
+        try {
+            return mAppDatabase.getOmeletDAO().findRequiredOmelets(dishName);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 
     public OmeletDAO getOmeletDAO() {

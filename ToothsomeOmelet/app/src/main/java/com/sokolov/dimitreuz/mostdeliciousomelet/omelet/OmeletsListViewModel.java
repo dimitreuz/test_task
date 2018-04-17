@@ -6,10 +6,10 @@ import android.databinding.BaseObservable;
 import android.databinding.Observable;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
-
 
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.AppExecutors;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.Omelet;
@@ -28,52 +28,27 @@ public class OmeletsListViewModel extends BaseObservable
     private final MutableLiveData<List<Omelet>> mOmelets;
     @NonNull
     private final OmeletRepository mRepository;
-    @Nullable
-    private Executor mCurrentExecutor;
 
     public final ObservableBoolean placeholderVisibility = new ObservableBoolean(true);
 
     public final ObservableField<String> inputText = new ObservableField<>();
 
+    @Nullable
+    private HandlerThread mHandlerThread;
+    @Nullable
+    private Handler mHandler;
+
     public OmeletsListViewModel(@NonNull OmeletRepository repository) {
         this.mRepository = repository;
         this.mOmelets = new MutableLiveData<>();
         mOmelets.setValue(new ArrayList<>());
-        registerInputTextObserver();
     }
 
     @Override
-    public void onOmeletsLoaded(List<Omelet.OmeletDTO> omelets) {
-        if (!omelets.isEmpty()) {
-            placeholderVisibility.set(false);
-            List<Omelet> list = Collections.unmodifiableList(omelets);
-            mOmelets.setValue(list);
-        }
-    }
-
-    private void searchDish(@NonNull String dishName) {
-        if (mCurrentExecutor != null) {
-            if (mCurrentExecutor instanceof AppExecutors.CancelableFuturesExecutor) {
-                AppExecutors.CancelableFuturesExecutor executor;
-                executor = (AppExecutors.CancelableFuturesExecutor) mCurrentExecutor;
-                executor.shutdownFutures();
-            }
-        }
-        mCurrentExecutor = mRepository.searchForOmelets(OmeletsListViewModel.this, dishName);
-    }
-
-    private void registerInputTextObserver() {
-        inputText.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                String text = inputText.get();
-                if (TextUtils.isEmpty(text)) {
-                    start();
-                } else {
-                    searchDish(text);
-                }
-            }
-        });
+    public synchronized void onOmeletsLoaded(List<Omelet.OmeletDTO> omelets) {
+        placeholderVisibility.set(!omelets.isEmpty());
+        List<Omelet> list = Collections.unmodifiableList(omelets);
+        mOmelets.setValue(list);
     }
 
     @Override
@@ -81,12 +56,46 @@ public class OmeletsListViewModel extends BaseObservable
         placeholderVisibility.set(true);
     }
 
-    public void start() {
-        mRepository.getOmelets(this);
-    }
+    private OnPropertyChangedCallback mCallback = new OnPropertyChangedCallback() {
+        @Override
+        public void onPropertyChanged(Observable sender, int propertyId) {
+            String text = inputText.get();
+            mHandler.post(() -> {
+                List<Omelet.OmeletDTO> omelets = mRepository.searchForDishes(text);
+                Executor executor = mRepository.getAppExecutors().getExecutor(AppExecutors.UI);
+                executor.execute(() -> {
+                    placeholderVisibility.set(omelets.isEmpty());
+                    mOmelets.setValue(Collections.unmodifiableList(omelets));
+                });
+            });
+        }
+    };
 
     public LiveData<List<Omelet>> getOmelets() {
         return mOmelets;
+    }
+
+    private static final String HANDLER_THREAD_NAME = "HANDLER_THREAD_NAME";
+
+    private void startHandlerThread() {
+        mHandlerThread = new HandlerThread(HANDLER_THREAD_NAME);
+        mHandlerThread.start();
+        mHandler = new Handler(mHandlerThread.getLooper());
+    }
+
+    public void start() {
+        mRepository.getOmeletsAsync(this);
+        startHandlerThread();
+        inputText.addOnPropertyChangedCallback(mCallback);
+    }
+
+    public void stop() {
+        inputText.removeOnPropertyChangedCallback(mCallback);
+        if (mHandlerThread != null) {
+            mHandlerThread.quit();
+        }
+        mHandlerThread = null;
+        mHandler = null;
     }
 
 }

@@ -11,7 +11,7 @@ public abstract class AbstractOmeletDataSource<T extends Omelet> implements Omel
         this.mAppExecutors = appExecutors;
     }
 
-    protected AppExecutors getAppExecutors() {
+    public AppExecutors getAppExecutors() {
         return mAppExecutors;
     }
 }

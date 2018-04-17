@@ -4,12 +4,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -63,11 +60,19 @@ public class AppExecutors {
     }
 
     private static class MainThreadExecutor implements Executor {
-        private Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+        private final Handler mainThreadHandler;
+
+        public MainThreadExecutor() {
+            mainThreadHandler = new Handler(Looper.getMainLooper());
+        }
 
         @Override
         public void execute(@NonNull Runnable command) {
             mainThreadHandler.post(command);
+        }
+
+        public Handler getMainThreadHandler() {
+            return mainThreadHandler;
         }
     }
 
@@ -81,25 +86,19 @@ public class AppExecutors {
 
         private final ExecutorService mService;
 
-        private final List<Future<?>> mFutures;
+        private volatile Future<?> mLastFuture;
 
         public CancelableFuturesExecutor(ExecutorService executorService) {
             this.mService = executorService;
-            this.mFutures = new ArrayList<>();
         }
 
         @Override
         public void execute(@NonNull Runnable command) {
-            mFutures.add(mService.submit(command));
+            mLastFuture = mService.submit(command);
         }
 
-        public void shutdownFutures() {
-            for (Future<?> task : mFutures) {
-                if (!task.isDone()) {
-                    task.cancel(true);
-                }
-            }
-            mFutures.clear();
+        public boolean cancelLastTask() {
+            return mLastFuture != null && !mLastFuture.isDone() && mLastFuture.cancel(true);
         }
     }
 }
