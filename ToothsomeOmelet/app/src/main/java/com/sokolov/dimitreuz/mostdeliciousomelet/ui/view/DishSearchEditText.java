@@ -28,7 +28,6 @@ public class DishSearchEditText extends AppCompatEditText
     @NonNull
     private final List<OnSearchCompleteListener> mListeners;
 
-
     public DishSearchEditText(Context context) {
         this(context, null);
     }

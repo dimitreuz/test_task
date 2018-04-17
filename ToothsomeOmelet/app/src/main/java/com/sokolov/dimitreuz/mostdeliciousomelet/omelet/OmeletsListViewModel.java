@@ -3,8 +3,11 @@ package com.sokolov.dimitreuz.mostdeliciousomelet.omelet;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.databinding.BaseObservable;
+import android.databinding.Observable;
+import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.View;
 
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.Omelet;
@@ -17,8 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class OmeletsListViewModel extends BaseObservable
-        implements OmeletDataSource.ExecutionCallback<Omelet.OmeletDTO>,
-        DishSearchEditText.OnSearchCompleteListener {
+        implements OmeletDataSource.ExecutionCallback<Omelet.OmeletDTO> {
 
     @NonNull
     private final MutableLiveData<List<Omelet>> mOmelets;
@@ -27,10 +29,13 @@ public class OmeletsListViewModel extends BaseObservable
 
     public final ObservableInt placeholderVisibility = new ObservableInt(View.VISIBLE);
 
+    public final ObservableField<String> inputText = new ObservableField<>();
+
     public OmeletsListViewModel(@NonNull OmeletRepository repository) {
         this.mRepository = repository;
         this.mOmelets = new MutableLiveData<>();
         mOmelets.setValue(new ArrayList<>());
+        registerInputTextObserver();
     }
 
     @Override
@@ -42,9 +47,23 @@ public class OmeletsListViewModel extends BaseObservable
         }
     }
 
+    private void registerInputTextObserver() {
+        inputText.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                String text = inputText.get();
+                if (TextUtils.isEmpty(text)) {
+                    start();
+                } else {
+                    mRepository.searchForOmelets(OmeletsListViewModel.this, text);
+                }
+            }
+        });
+    }
+
     @Override
     public void onDataNotAvailable() {
-        placeholderVisibility.set(View.GONE);
+        placeholderVisibility.set(View.VISIBLE);
     }
 
     public void start() {
@@ -55,13 +74,4 @@ public class OmeletsListViewModel extends BaseObservable
         return mOmelets;
     }
 
-    @Override
-    public void onSearched(List<Omelet.OmeletDTO> omelets) {
-        onOmeletsLoaded(omelets);
-    }
-
-    @Override
-    public void onError() {
-        placeholderVisibility.set(View.VISIBLE);
-    }
 }
