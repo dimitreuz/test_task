@@ -73,7 +73,6 @@ public abstract class BaseActivity<VM extends BaseObservable> extends AppCompatA
     }
 
     public <VB extends Observable> VB obtainViewModel(Class<? extends Observable> clazz) {
-
         AppExecutors appExecutors = new AppExecutors();
         OmeletRepository repository = OmeletRepository.getInstance(appExecutors, getApplicationContext());
         if (clazz.isAssignableFrom(OmeletItemViewModel.class)) {

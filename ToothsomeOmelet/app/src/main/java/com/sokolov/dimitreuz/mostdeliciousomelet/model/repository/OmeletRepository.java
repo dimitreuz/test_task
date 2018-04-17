@@ -2,6 +2,7 @@ package com.sokolov.dimitreuz.mostdeliciousomelet.model.repository;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.AppExecutors;
@@ -62,6 +63,37 @@ public class OmeletRepository extends AbstractOmeletDataSource<Omelet.OmeletDTO>
         }
     }
 
+    @Override
+    public Executor searchForOmelets(@NonNull ExecutionCallback<Omelet.OmeletDTO> callback, @NonNull String dishName) {
+        if (TextUtils.isEmpty(dishName)) {
+            return executeOnMainThread(() -> getOmelets(callback));
+        } else {
+            return mRemoteDataSource.searchForOmelets(new ExecutionCallback<OmeletAPI>() {
+                @Override
+                public void onOmeletsLoaded(List<OmeletAPI> omelets) {
+                    List<Omelet.OmeletDTO> dishes = Converters.convertToCachedOmelets(omelets);
+                    executeOnMainThread(() -> callback.onOmeletsLoaded(dishes));
+                }
+
+                @Override
+                public void onDataNotAvailable() {
+                    mLocalDataSource.searchForOmelets(new ExecutionCallback<OmeletDB>() {
+                        @Override
+                        public void onOmeletsLoaded(List<OmeletDB> omelets) {
+                            List<Omelet.OmeletDTO> dishes = Converters.convertToCachedOmelets(omelets);
+                            executeOnMainThread(() -> callback.onOmeletsLoaded(dishes));
+                        }
+
+                        @Override
+                        public void onDataNotAvailable() {
+                            callback.onDataNotAvailable();
+                        }
+                    }, dishName);
+                }
+            }, dishName);
+        }
+    }
+
     private void preCacheRemoteOmelets(@NonNull ExecutionCallback<Omelet.OmeletDTO> callback) {
         mRemoteDataSource.getOmelets(new ExecutionCallback<OmeletAPI>() {
             @Override
@@ -84,8 +116,9 @@ public class OmeletRepository extends AbstractOmeletDataSource<Omelet.OmeletDTO>
         return Converters.convertToCachedOmelets(omelets);
     }
 
-    public void executeOnMainThread(Runnable runnable) {
+    public Executor executeOnMainThread(Runnable runnable) {
         Executor uiExecutor = getAppExecutors().getExecutor(AppExecutors.UI);
         uiExecutor.execute(runnable);
+        return uiExecutor;
     }
 }
