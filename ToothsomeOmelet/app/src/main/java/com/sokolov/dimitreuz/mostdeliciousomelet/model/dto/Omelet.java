@@ -1,5 +1,17 @@
 package com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO;
 
+/**
+ * Current interface is used to describe
+ * omelet instance in several context, such as:
+ * <ul>
+ *     <li>Database</li>
+ *     <li>Server API (Remote repository)</li>
+ *     <li>Transfer object described below.</li>
+ * </ul>
+ *
+ * Such approach was introduced to divide object`s
+ * representation to several contexts described above.
+ */
 public interface Omelet {
 
     String getTitle();
