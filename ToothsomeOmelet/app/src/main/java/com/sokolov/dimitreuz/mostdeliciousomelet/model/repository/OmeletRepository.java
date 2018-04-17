@@ -3,7 +3,6 @@ package com.sokolov.dimitreuz.mostdeliciousomelet.model.repository;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.AppExecutors;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.Omelet;
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-public class OmeletRepository extends AbstractOmeletDataSource<Omelet.OmeletDTO>{
+public class OmeletRepository extends AbstractOmeletDataSource<Omelet.OmeletDTO> {
 
     @NonNull
     private OmeletDataSource<OmeletDB> mLocalDataSource;
@@ -43,9 +42,9 @@ public class OmeletRepository extends AbstractOmeletDataSource<Omelet.OmeletDTO>
     }
 
     @Override
-    public void getOmelets(@NonNull ExecutionCallback<Omelet.OmeletDTO> callback) {
+    public void getOmeletsAsync(@NonNull ExecutionCallback<Omelet.OmeletDTO> callback) {
         if (mCachedOmelets.isEmpty()) {
-            mLocalDataSource.getOmelets(new ExecutionCallback<OmeletDB>() {
+            mLocalDataSource.getOmeletsAsync(new ExecutionCallback<OmeletDB>() {
 
                 @Override
                 public void onOmeletsLoaded(List<OmeletDB> omelets) {
@@ -64,38 +63,63 @@ public class OmeletRepository extends AbstractOmeletDataSource<Omelet.OmeletDTO>
     }
 
     @Override
-    public Executor searchForOmelets(@NonNull ExecutionCallback<Omelet.OmeletDTO> callback, @NonNull String dishName) {
-        if (TextUtils.isEmpty(dishName)) {
-            return executeOnMainThread(() -> getOmelets(callback));
-        } else {
-            return mRemoteDataSource.searchForOmelets(new ExecutionCallback<OmeletAPI>() {
-                @Override
-                public void onOmeletsLoaded(List<OmeletAPI> omelets) {
-                    List<Omelet.OmeletDTO> dishes = Converters.convertToCachedOmelets(omelets);
-                    executeOnMainThread(() -> callback.onOmeletsLoaded(dishes));
-                }
-
-                @Override
-                public void onDataNotAvailable() {
-                    mLocalDataSource.searchForOmelets(new ExecutionCallback<OmeletDB>() {
-                        @Override
-                        public void onOmeletsLoaded(List<OmeletDB> omelets) {
-                            List<Omelet.OmeletDTO> dishes = Converters.convertToCachedOmelets(omelets);
-                            executeOnMainThread(() -> callback.onOmeletsLoaded(dishes));
-                        }
-
-                        @Override
-                        public void onDataNotAvailable() {
-                            callback.onDataNotAvailable();
-                        }
-                    }, dishName);
-                }
-            }, dishName);
+    public List<Omelet.OmeletDTO> getOmelets() {
+        if (mCachedOmelets.isEmpty()) {
+            mCachedOmelets = Converters.convertToCachedOmelets(mRemoteDataSource.getOmelets());
+            if (mCachedOmelets.isEmpty()) {
+                mCachedOmelets = Converters.convertToCachedOmelets(mLocalDataSource.getOmelets());
+            }
         }
+        return mCachedOmelets;
+    }
+
+    @Override
+    public void searchForDishesAsync(@NonNull ExecutionCallback<Omelet.OmeletDTO> callback, @NonNull String dishName) {
+        mRemoteDataSource.searchForDishesAsync(new ExecutionCallback<OmeletAPI>() {
+
+            @Override
+            public void onOmeletsLoaded(List<OmeletAPI> omelets) {
+                List<Omelet.OmeletDTO> dishes;
+                if (omelets.isEmpty()) {
+                    dishes = mCachedOmelets;
+                } else {
+                    dishes = Converters.convertToCachedOmelets(omelets);
+                }
+                executeOnMainThread(() -> callback.onOmeletsLoaded(dishes));
+            }
+
+            @Override
+            public void onDataNotAvailable() {
+                mLocalDataSource.searchForDishesAsync(new ExecutionCallback<OmeletDB>() {
+                    @Override
+                    public void onOmeletsLoaded(List<OmeletDB> omelets) {
+                        List<Omelet.OmeletDTO> dishes = Converters.convertToCachedOmelets(omelets);
+                        executeOnMainThread(() -> callback.onOmeletsLoaded(dishes));
+                    }
+
+                    @Override
+                    public void onDataNotAvailable() {
+                        callback.onDataNotAvailable();
+                    }
+                }, dishName);
+            }
+        }, dishName);
+    }
+
+    @Override
+    public List<Omelet.OmeletDTO> searchForDishes(@NonNull String dishName) {
+        if (TextUtils.isEmpty(dishName)) {
+            return mCachedOmelets;
+        }
+        List<? extends Omelet> omelets = mRemoteDataSource.searchForDishes(dishName);
+        if (omelets.isEmpty()) {
+            omelets = mLocalDataSource.searchForDishes(dishName);
+        }
+        return Converters.convertToCachedOmelets(omelets);
     }
 
     private void preCacheRemoteOmelets(@NonNull ExecutionCallback<Omelet.OmeletDTO> callback) {
-        mRemoteDataSource.getOmelets(new ExecutionCallback<OmeletAPI>() {
+        mRemoteDataSource.getOmeletsAsync(new ExecutionCallback<OmeletAPI>() {
             @Override
             public void onOmeletsLoaded(List<OmeletAPI> omelets) {
                 mCachedOmelets = saveOmeletsLocally(omelets);
@@ -103,7 +127,8 @@ public class OmeletRepository extends AbstractOmeletDataSource<Omelet.OmeletDTO>
             }
 
             @Override
-            public void onDataNotAvailable() { }
+            public void onDataNotAvailable() {
+            }
         });
     }
 
@@ -116,7 +141,7 @@ public class OmeletRepository extends AbstractOmeletDataSource<Omelet.OmeletDTO>
         return Converters.convertToCachedOmelets(omelets);
     }
 
-    public Executor executeOnMainThread(Runnable runnable) {
+    private Executor executeOnMainThread(Runnable runnable) {
         Executor uiExecutor = getAppExecutors().getExecutor(AppExecutors.UI);
         uiExecutor.execute(runnable);
         return uiExecutor;

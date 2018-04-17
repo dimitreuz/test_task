@@ -16,10 +16,11 @@ public interface OmeletDataSource<T extends Omelet> {
         void onDataNotAvailable();
     }
 
-    void getOmelets(@NonNull ExecutionCallback<T> callback);
+    void getOmeletsAsync(@NonNull ExecutionCallback<T> callback);
 
-    Executor searchForOmelets(
-            @NonNull ExecutionCallback<T> callback,
-            @NonNull String dishName
-    );
+    List<T> getOmelets();
+
+    void searchForDishesAsync(@NonNull ExecutionCallback<T> callback, @NonNull String dishName);
+
+    List<T> searchForDishes(@NonNull String dishName);
 }
