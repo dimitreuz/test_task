@@ -4,11 +4,16 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class AppExecutors {
 
@@ -48,19 +53,12 @@ public class AppExecutors {
         }
     }
 
-    private static class NetExecutor implements Executor {
+    private static class NetExecutor extends CancelableFuturesExecutor {
 
         private static final int THREAD_COUNT = 2;
 
-        private final Executor mNetExecutor;
-
-        public NetExecutor() {
-            mNetExecutor = Executors.newFixedThreadPool(THREAD_COUNT);
-        }
-
-        @Override
-        public void execute(@NonNull Runnable command) {
-            mNetExecutor.execute(command);
+        NetExecutor() {
+            super(Executors.newFixedThreadPool(THREAD_COUNT));
         }
     }
 
@@ -73,17 +71,35 @@ public class AppExecutors {
         }
     }
 
-    private static final class DiskIOThreadExecutor implements Executor {
+    private static final class DiskIOThreadExecutor extends CancelableFuturesExecutor {
+        DiskIOThreadExecutor() {
+            super(Executors.newSingleThreadExecutor());
+        }
+    }
 
-        private final Executor mDiskExecutor;
+    public static abstract class CancelableFuturesExecutor implements Executor {
 
-        public DiskIOThreadExecutor() {
-            mDiskExecutor = Executors.newSingleThreadExecutor();
+        private final ExecutorService mService;
+
+        private final List<Future<?>> mFutures;
+
+        public CancelableFuturesExecutor(ExecutorService executorService) {
+            this.mService = executorService;
+            this.mFutures = new ArrayList<>();
         }
 
         @Override
         public void execute(@NonNull Runnable command) {
-            mDiskExecutor.execute(command);
+            mFutures.add(mService.submit(command));
+        }
+
+        public void shutdownFutures() {
+            for (Future<?> task : mFutures) {
+                if (!task.isDone()) {
+                    task.cancel(true);
+                }
+            }
+            mFutures.clear();
         }
     }
 }

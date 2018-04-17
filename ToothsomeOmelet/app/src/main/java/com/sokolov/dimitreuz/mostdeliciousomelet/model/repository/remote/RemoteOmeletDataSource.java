@@ -1,6 +1,7 @@
 package com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.remote;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.AppExecutors;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.api.OmeletsAPI;
@@ -32,7 +33,6 @@ public class RemoteOmeletDataSource extends AbstractOmeletDataSource<OmeletAPI> 
                 List<OmeletAPI> omelets = call.execute().body().getRequiredOmelets();
                 callback.onOmeletsLoaded(omelets);
             } catch (IOException e) {
-                e.printStackTrace();
                 callback.onDataNotAvailable();
             }
         });
@@ -45,10 +45,12 @@ public class RemoteOmeletDataSource extends AbstractOmeletDataSource<OmeletAPI> 
             try {
                 Call<OmeletsAPIHolder> call = getApiService().getSearchedOmelets(dishName);
                 List<OmeletAPI> omelets = call.execute().body().getRequiredOmelets();
+                Thread.sleep(10);
                 callback.onOmeletsLoaded(omelets);
             } catch (IOException e) {
-                e.printStackTrace();
                 callback.onDataNotAvailable();
+            } catch (InterruptedException e) {
+                Log.e("THREAD","INTERRUPTED");
             }
         });
         return executor;

@@ -13,6 +13,7 @@ import com.sokolov.dimitreuz.mostdeliciousomelet.omelet.OmeletNavigator;
 import com.sokolov.dimitreuz.mostdeliciousomelet.omelet.OmeletsListViewModel;
 import com.sokolov.dimitreuz.mostdeliciousomelet.ui.BaseFragment;
 import com.sokolov.dimitreuz.mostdeliciousomelet.ui.OmeletsAdapter;
+import com.sokolov.dimitreuz.mostdeliciousomelet.ui.view.DishSearchEditText;
 import com.sokolov.dimitreuz.mostdeliciousomelet.utils.Converters;
 
 public class OmeletsListFragment extends BaseFragment<OmeletsListViewModel> implements OmeletNavigator {
@@ -32,7 +33,8 @@ public class OmeletsListFragment extends BaseFragment<OmeletsListViewModel> impl
 
     @Override
     public void initViews(@NonNull View view) {
-        setUpRecyclerView(view);
+        setupRecyclerView(view);
+        setupSearchEditText(view);
     }
 
     @Override
@@ -46,11 +48,16 @@ public class OmeletsListFragment extends BaseFragment<OmeletsListViewModel> impl
         getViewModel().start();
     }
 
-    private void setUpRecyclerView(View view) {
+    private void setupRecyclerView(View view) {
         RecyclerView recyclerView = view.findViewById(R.id.omelets_recyclerView);
         mAdapter = new OmeletsAdapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(mAdapter);
+    }
+
+    private void setupSearchEditText(View view) {
+        DishSearchEditText editText = view.findViewById(R.id.dish_search_editText);
+        editText.addSearchListener(getViewModel());
     }
 
     @Override

@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.sokolov.dimitreuz.mostdeliciousomelet.ui.view.DishSearchEditText
+        android:id="@+id/dish_search_editText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:hint="@string/search_input_hint"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:focusableInTouchMode="true"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:layout_margin="8dp"
+        />
+
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -12,15 +27,14 @@
             android:id="@+id/empty_list_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No omletes"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:text="No omelets" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/omelets_recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
+            android:layout_height="match_parent" />
 
     </FrameLayout>
 
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

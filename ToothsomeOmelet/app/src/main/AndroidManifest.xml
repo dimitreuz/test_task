@@ -13,6 +13,7 @@
         android:name=".OmeletApplication">
 
         <activity android:name=".ui.omelet.OmeletsListActivity"
+            android:windowSoftInputMode="adjustNothing"
             android:label="@string/omelets_activity_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

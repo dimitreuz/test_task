@@ -14,6 +14,6 @@ public interface OmeletDAO extends ObjectDAO<OmeletDB> {
     @Query("SELECT * FROM omelet")
     List<OmeletDB> getAll();
 
-    @Query("SELECT * FROM omelet WHERE omelet.title LIKE '% :dishName %'")
-    List<OmeletDB> findRquiredoOmelets(@NonNull String dishName);
+    @Query("SELECT * FROM omelet WHERE omelet.title LIKE ('%' || :dishName || '%')")
+    List<OmeletDB> findRequiredOmelets(@NonNull String dishName);
 }

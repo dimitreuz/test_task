@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">MostDeliciousOmelet</string>
     <string name="omelets_activity_title">Omelets</string>
+    <string name="search_input_hint">Input dish name...</string>
 </resources>

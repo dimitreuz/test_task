@@ -2,6 +2,7 @@ package com.sokolov.dimitreuz.mostdeliciousomelet.model.repository;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.AppExecutors;
@@ -64,7 +65,7 @@ public class OmeletRepository extends AbstractOmeletDataSource<Omelet.OmeletDTO>
 
     @Override
     public Executor searchForOmelets(@NonNull ExecutionCallback<Omelet.OmeletDTO> callback, @NonNull String dishName) {
-        if (dishName.isEmpty()) {
+        if (TextUtils.isEmpty(dishName)) {
             return executeOnMainThread(() -> getOmelets(callback));
         } else {
             return mRemoteDataSource.searchForOmelets(new ExecutionCallback<OmeletAPI>() {

@@ -2,28 +2,31 @@ package com.sokolov.dimitreuz.mostdeliciousomelet.ui.view;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.AppExecutors;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.Omelet;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.OmeletDataSource;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.OmeletRepository;
 
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
-public class DishSearchEditText extends android.support.v7.widget.AppCompatEditText implements TextWatcher {
+public class DishSearchEditText extends AppCompatEditText
+        implements TextWatcher, OmeletDataSource.ExecutionCallback<Omelet.OmeletDTO> {
 
     @NonNull
-    private final AppExecutors mAppExecutors;
+    private final OmeletRepository mRepository;
+    @Nullable
+    private Executor mCurrentExecutor;
     @NonNull
-    private Thread mTextProcessingThread;
-    @NonNull
-    private PipedReader mReader;
-    @NonNull
-    private PipedWriter mWriter;
+    private final List<OnSearchCompleteListener> mListeners;
 
 
     public DishSearchEditText(Context context) {
@@ -36,31 +39,55 @@ public class DishSearchEditText extends android.support.v7.widget.AppCompatEditT
 
     public DishSearchEditText(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        mListeners = new ArrayList<>();
+        mRepository = OmeletRepository.getInstance(new AppExecutors(), getContext());
         addTextChangedListener(this);
-        mAppExecutors = new AppExecutors();
     }
 
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+        /* IGNORED */
     }
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+        /* IGNORED */
     }
 
     @Override
     public void afterTextChanged(Editable s) {
-        String input = s.toString();
-
+        if (mCurrentExecutor != null) {
+            if (mCurrentExecutor instanceof AppExecutors.CancelableFuturesExecutor) {
+                AppExecutors.CancelableFuturesExecutor executor;
+                executor = (AppExecutors.CancelableFuturesExecutor) mCurrentExecutor;
+                executor.shutdownFutures();
+            }
+        }
+        mCurrentExecutor = mRepository.searchForOmelets(this, s.toString());
     }
 
-    public void onResult(List<Omelet.OmeletDTO> omelets) {
-
+    public void addSearchListener(@NonNull OnSearchCompleteListener listener) {
+        mListeners.add(listener);
     }
 
-    public void onActivityDestroyed() {
-        removeTextChangedListener(this);
+    @Override
+    public void onOmeletsLoaded(List<Omelet.OmeletDTO> omelets) {
+        for (OnSearchCompleteListener listener : mListeners) {
+            listener.onSearched(omelets);
+        }
+    }
+
+    @Override
+    public void onDataNotAvailable() {
+        for (OnSearchCompleteListener listener : mListeners) {
+            listener.onError();
+        }
+    }
+
+    public interface OnSearchCompleteListener {
+
+        void onSearched(List<Omelet.OmeletDTO> omelets);
+
+        void onError();
     }
 }

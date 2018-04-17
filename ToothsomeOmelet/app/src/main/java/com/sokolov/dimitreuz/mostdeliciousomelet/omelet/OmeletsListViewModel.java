@@ -2,25 +2,26 @@ package com.sokolov.dimitreuz.mostdeliciousomelet.omelet;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.Omelet;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.OmeletDataSource;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.OmeletRepository;
+import com.sokolov.dimitreuz.mostdeliciousomelet.ui.view.DishSearchEditText;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class OmeletsListViewModel extends BaseObservable
-        implements OmeletDataSource.ExecutionCallback<Omelet.OmeletDTO> {
+        implements OmeletDataSource.ExecutionCallback<Omelet.OmeletDTO>,
+        DishSearchEditText.OnSearchCompleteListener {
 
     @NonNull
-    private final LiveData<List<Omelet>> mOmelets;
+    private final MutableLiveData<List<Omelet>> mOmelets;
     @NonNull
     private final OmeletRepository mRepository;
 
@@ -29,17 +30,15 @@ public class OmeletsListViewModel extends BaseObservable
     public OmeletsListViewModel(@NonNull OmeletRepository repository) {
         this.mRepository = repository;
         this.mOmelets = new MutableLiveData<>();
-        ((MutableLiveData<List<Omelet>>) mOmelets).setValue(new ArrayList<>());
+        mOmelets.setValue(new ArrayList<>());
     }
 
     @Override
     public void onOmeletsLoaded(List<Omelet.OmeletDTO> omelets) {
-        List<Omelet> list = mOmelets.getValue();
-        if (list != null && list.isEmpty()) {
-            list.clear();
-            list.addAll(omelets);
+        if (!omelets.isEmpty()) {
+            List<Omelet> list = Collections.unmodifiableList(omelets);
             placeholderVisibility.set(View.GONE);
-            ((MutableLiveData<List<Omelet>>) mOmelets).setValue(list);
+            mOmelets.setValue(list);
         }
     }
 
@@ -56,5 +55,13 @@ public class OmeletsListViewModel extends BaseObservable
         return mOmelets;
     }
 
+    @Override
+    public void onSearched(List<Omelet.OmeletDTO> omelets) {
+        onOmeletsLoaded(omelets);
+    }
 
+    @Override
+    public void onError() {
+        placeholderVisibility.set(View.VISIBLE);
+    }
 }
