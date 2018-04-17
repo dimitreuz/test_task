@@ -32,7 +32,6 @@ public class DishSearchEditText extends android.support.v7.widget.AppCompatEditT
 
     public DishSearchEditText(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
-
     }
 
     public DishSearchEditText(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -53,6 +52,7 @@ public class DishSearchEditText extends android.support.v7.widget.AppCompatEditT
 
     @Override
     public void afterTextChanged(Editable s) {
+        String input = s.toString();
 
     }
 

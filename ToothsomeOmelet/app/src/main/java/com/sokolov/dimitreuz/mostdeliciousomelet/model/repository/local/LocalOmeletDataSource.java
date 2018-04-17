@@ -8,8 +8,10 @@ import com.sokolov.dimitreuz.mostdeliciousomelet.model.database.AppDatabase;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.database.OmeletDAO;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.OmeletDB;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.AbstractOmeletDataSource;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.OmeletDataSource;
 
 import java.util.List;
+import java.util.concurrent.Executor;
 
 public class LocalOmeletDataSource extends AbstractOmeletDataSource<OmeletDB> {
 
@@ -38,6 +40,25 @@ public class LocalOmeletDataSource extends AbstractOmeletDataSource<OmeletDB> {
                 }
         );
 
+    }
+
+    @Override
+    public Executor searchForOmelets(@NonNull ExecutionCallback<OmeletDB> callback, @NonNull String dishName) {
+        Executor executor = getAppExecutors().getExecutor(AppExecutors.DISK);
+        executor.execute(() -> {
+            List<OmeletDB> omelets = mAppDatabase.getOmeletDAO().findRquiredoOmelets(dishName);
+            try {
+                if (omelets == null) {
+                    callback.onDataNotAvailable();
+                } else {
+                    callback.onOmeletsLoaded(omelets);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                callback.onDataNotAvailable();
+            }
+        });
+        return executor;
     }
 
     public OmeletDAO getOmeletDAO() {

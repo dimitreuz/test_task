@@ -7,6 +7,7 @@ import com.sokolov.dimitreuz.mostdeliciousomelet.model.api.OmeletsAPI;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.OmeletAPI;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.api.OmeletsAPIHolder;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.AbstractOmeletDataSource;
+import com.sokolov.dimitreuz.mostdeliciousomelet.model.repository.OmeletDataSource;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,14 +38,12 @@ public class RemoteOmeletDataSource extends AbstractOmeletDataSource<OmeletAPI> 
         });
     }
 
-    public Executor getRequiredishes(
-            @NonNull ExecutionCallback<OmeletAPI> callback,
-            @NonNull String input
-    ) {
+    @Override
+    public Executor searchForOmelets(@NonNull ExecutionCallback<OmeletAPI> callback, @NonNull String dishName) {
         Executor executor = getAppExecutors().getExecutor(AppExecutors.NET);
         executor.execute(() -> {
             try {
-                Call<OmeletsAPIHolder> call = getApiService().getSearchedOmelets(input);
+                Call<OmeletsAPIHolder> call = getApiService().getSearchedOmelets(dishName);
                 List<OmeletAPI> omelets = call.execute().body().getRequiredOmelets();
                 callback.onOmeletsLoaded(omelets);
             } catch (IOException e) {
