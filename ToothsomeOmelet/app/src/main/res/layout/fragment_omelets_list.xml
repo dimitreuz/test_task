@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.sokolov.dimitreuz.mostdeliciousomelet.ui.view.DishSearchEditText
+    <EditText
         android:id="@+id/dish_search_editText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,7 +18,6 @@
         android:layout_margin="8dp"
         />
 
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -28,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="No omelets" />
+            android:text="@string/no_dishes" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/omelets_recyclerView"

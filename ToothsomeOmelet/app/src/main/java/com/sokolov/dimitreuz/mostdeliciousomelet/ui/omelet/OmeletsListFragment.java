@@ -1,22 +1,27 @@
 package com.sokolov.dimitreuz.mostdeliciousomelet.ui.omelet;
 
 import android.content.Intent;
+import android.databinding.Observable;
+import android.databinding.ObservableBoolean;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.sokolov.dimitreuz.mostdeliciousomelet.R;
 import com.sokolov.dimitreuz.mostdeliciousomelet.omelet.OmeletNavigator;
 import com.sokolov.dimitreuz.mostdeliciousomelet.omelet.OmeletsListViewModel;
 import com.sokolov.dimitreuz.mostdeliciousomelet.ui.BaseFragment;
 import com.sokolov.dimitreuz.mostdeliciousomelet.ui.OmeletsAdapter;
-import com.sokolov.dimitreuz.mostdeliciousomelet.ui.view.DishSearchEditText;
 import com.sokolov.dimitreuz.mostdeliciousomelet.utils.Converters;
 
-public class OmeletsListFragment extends BaseFragment<OmeletsListViewModel> implements OmeletNavigator {
+public class OmeletsListFragment extends BaseFragment<OmeletsListViewModel> implements OmeletNavigator, TextWatcher {
 
     private OmeletsAdapter mAdapter;
 
@@ -35,6 +40,7 @@ public class OmeletsListFragment extends BaseFragment<OmeletsListViewModel> impl
     public void initViews(@NonNull View view) {
         setupRecyclerView(view);
         setupSearchEditText(view);
+        setupPlaceholder(view);
     }
 
     @Override
@@ -56,8 +62,20 @@ public class OmeletsListFragment extends BaseFragment<OmeletsListViewModel> impl
     }
 
     private void setupSearchEditText(View view) {
-        DishSearchEditText editText = view.findViewById(R.id.dish_search_editText);
-        editText.addSearchListener(getViewModel());
+        EditText editText = view.findViewById(R.id.dish_search_editText);
+        editText.addTextChangedListener(this);
+    }
+
+    private void setupPlaceholder(View view) {
+        TextView textView = view.findViewById(R.id.empty_list_view);
+        ObservableBoolean visibilityField = getViewModel().placeholderVisibility;
+        visibilityField.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                int visibility = visibilityField.get() ? View.VISIBLE : View.GONE;
+                textView.setVisibility(visibility);
+            }
+        });
     }
 
     @Override
@@ -73,7 +91,17 @@ public class OmeletsListFragment extends BaseFragment<OmeletsListViewModel> impl
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        /* IGNORED */
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        /* IGNORED */
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        getViewModel().inputText.set(s.toString());
     }
 }
