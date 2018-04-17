@@ -14,6 +14,7 @@ public class AbstractViewHolder<VB extends ViewDataBinding> extends RecyclerView
 
     public AbstractViewHolder(VB binding) {
         super(binding.getRoot());
+        this.mBinding = binding;
     }
 
     public static<VB extends ViewDataBinding> AbstractViewHolder<VB> newInstance(
@@ -28,5 +29,9 @@ public class AbstractViewHolder<VB extends ViewDataBinding> extends RecyclerView
 
     public VB getBinding() {
         return mBinding;
+    }
+
+    public void unbind() {
+        mBinding = null;
     }
 }

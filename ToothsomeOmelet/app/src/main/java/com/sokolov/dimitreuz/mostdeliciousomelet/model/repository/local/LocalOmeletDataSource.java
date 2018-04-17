@@ -13,28 +13,34 @@ import java.util.List;
 
 public class LocalOmeletDataSource extends AbstractOmeletDataSource<OmeletDB> {
 
-    private AppDatabase mAppDatabse;
+    private AppDatabase mAppDatabase;
 
     public LocalOmeletDataSource(@NonNull AppExecutors appExecutors, @NonNull Context context) {
         super(appExecutors);
-        mAppDatabse = AppDatabase.getInstance(context);
+        mAppDatabase = AppDatabase.getInstance(context);
     }
 
     @Override
     public void getOmelets(ExecutionCallback<OmeletDB> callback) {
-        try {
-            List<OmeletDB> omelets = mAppDatabse.getOmeletDAO().getAll();
-            if (omelets == null || omelets.isEmpty()) {
-                callback.onDataNotAvailable();
-            } else {
-                callback.onOmeletsLoaded(omelets);
-            }
-        } catch (Exception e) {
-            callback.onDataNotAvailable();
-        }
+        getAppExecutors().getExecutor(AppExecutors.DISK).execute(
+                () -> {
+                    try {
+                        List<OmeletDB> omelets = mAppDatabase.getOmeletDAO().getAll();
+                        if (omelets == null || omelets.isEmpty()) {
+                            callback.onDataNotAvailable();
+                        } else {
+                            callback.onOmeletsLoaded(omelets);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        callback.onDataNotAvailable();
+                    }
+                }
+        );
+
     }
 
     public OmeletDAO getOmeletDAO() {
-        return mAppDatabse.getOmeletDAO();
+        return mAppDatabase.getOmeletDAO();
     }
 }

@@ -2,6 +2,7 @@ package com.sokolov.dimitreuz.mostdeliciousomelet.model.repository;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.AppExecutors;
 import com.sokolov.dimitreuz.mostdeliciousomelet.model.DTO.Omelet;
@@ -70,9 +71,7 @@ public class OmeletRepository extends AbstractOmeletDataSource<Omelet.OmeletDTO>
             }
 
             @Override
-            public void onDataNotAvailable() {
-
-            }
+            public void onDataNotAvailable() { }
         });
     }
 

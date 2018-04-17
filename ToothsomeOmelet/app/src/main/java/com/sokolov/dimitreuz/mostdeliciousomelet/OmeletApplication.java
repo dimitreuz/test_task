@@ -1,4 +1,6 @@
 package com.sokolov.dimitreuz.mostdeliciousomelet;
 
-public class OmeletApplication {
+import android.app.Application;
+
+public class OmeletApplication extends Application {
 }
